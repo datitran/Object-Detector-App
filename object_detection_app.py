@@ -10,6 +10,7 @@ from utils.app_utils import FPS, WebcamVideoStream
 from multiprocessing import Queue, Pool
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
+from object_detection.utils.nlp import update_state, describe_state, say
 
 CWD_PATH = os.getcwd()
 
@@ -20,16 +21,16 @@ PATH_TO_CKPT = os.path.join(CWD_PATH, 'object_detection', MODEL_NAME, 'frozen_in
 # List of the strings that is used to add correct label for each box.
 PATH_TO_LABELS = os.path.join(CWD_PATH, 'object_detection', 'data', 'mscoco_label_map.pbtxt')
 
-NUM_CLASSES = 90
-
 # Loading label map
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
-categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES,
-                                                            use_display_name=True)
+print(label_map)
+
+# though mobilenet can handle
+categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=90, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
 
-def detect_objects(image_np, sess, detection_graph):
+def detect_objects(image_np, sess, detection_graph, utterance_frames=20):
     # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
     image_np_expanded = np.expand_dims(image_np, axis=0)
     image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
@@ -57,7 +58,18 @@ def detect_objects(image_np, sess, detection_graph):
         category_index,
         use_normalized_coordinates=True,
         line_thickness=8)
+
+    # Describe the image
+    state = update_state(boxes=np.squeeze(boxes),
+                         classes=np.squeeze(classes).astype(np.int32),
+                         scores=np.squeeze(scores), category_index=category_index)
+    if not update_state.i % utterance_frames:
+        description = describe_state(state)
+        say(description)
     return image_np
+
+
+detect_objects.state = []  # poor man's class/object
 
 
 def worker(input_q, output_q):
@@ -87,6 +99,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-src', '--source', dest='video_source', type=int,
                         default=0, help='Device index of the camera.')
+    parser.add_argument('-u', '--url', dest='video_stream_source', type=str,
+                        help='Url for rtsp stream. Don\'t use with `-src` argument')
     parser.add_argument('-wd', '--width', dest='width', type=int,
                         default=480, help='Width of the frames in the video stream.')
     parser.add_argument('-ht', '--height', dest='height', type=int,
@@ -104,7 +118,12 @@ if __name__ == '__main__':
     output_q = Queue(maxsize=args.queue_size)
     pool = Pool(args.num_workers, worker, (input_q, output_q))
 
-    video_capture = WebcamVideoStream(src=args.video_source,
+    source = args.video_stream_source
+
+    if source is None:
+        source = args.video_source
+
+    video_capture = WebcamVideoStream(src=source,
                                       width=args.width,
                                       height=args.height).start()
     fps = FPS().start()

@@ -12,6 +12,9 @@ A real-time object recognition application using [Google's TensorFlow Object Det
     * Number of workers `--num-workers=2`
     * Size of the queue `--queue-size=5`
 
+## Updating the environment
+`conda env update -f environment.yml`
+
 ## Tests
 ```
 pytest -vs utils/
@@ -23,7 +26,7 @@ pytest -vs utils/
 - [OpenCV 3.0](http://opencv.org/)
 
 ## Notes
-- OpenCV 3.1 might crash on OSX after a while, so that's why I had to switch to version 3.0. See open issue and solution [here](https://github.com/opencv/opencv/issues/5874).
+- ~~OpenCV 3.1 might crash on OSX after a while, so that's why I had to switch to version 3.0. See open issue and solution [here](https://github.com/opencv/opencv/issues/5874).~~
 - Moving the `.read()` part of the video stream in a multiple child processes did not work. However, it was possible to move it to a separate thread.
 
 ## Copyright

@@ -19,7 +19,9 @@ These functions often receive an image, perform some visualization on the image.
 The functions do not return a value, instead they modify the image itself.
 
 """
+import os
 import collections
+
 import numpy as np
 import PIL.Image as Image
 import PIL.ImageColor as ImageColor
@@ -315,7 +317,7 @@ def draw_mask_on_image_array(image, mask, color='red', alpha=0.7):
   solid_color = np.expand_dims(
       np.ones_like(mask), axis=2) * np.reshape(list(rgb), [1, 1, 3])
   pil_solid_color = Image.fromarray(np.uint8(solid_color)).convert('RGBA')
-  pil_mask = Image.fromarray(np.uint8(255.0*alpha*mask)).convert('L')
+  pil_mask = Image.fromarray(np.uint8(255.0 * alpha * mask)).convert('L')
   pil_image = Image.composite(pil_solid_color, pil_image, pil_mask)
   np.copyto(image, np.array(pil_image.convert('RGB')))
 
@@ -380,16 +382,11 @@ def visualize_boxes_and_labels_on_image_array(image,
       if scores is None:
         box_to_color_map[box] = 'black'
       else:
-        if not agnostic_mode:
-          if classes[i] in category_index.keys():
-            class_name = category_index[classes[i]]['name']
-          else:
-            class_name = 'N/A'
-          display_str = '{}: {}%'.format(
-              class_name,
-              int(100*scores[i]))
-        else:
+        if agnostic_mode:
           display_str = 'score: {}%'.format(int(100 * scores[i]))
+        else:
+          class_name = category_index.get(classes[i], 'object')['name']
+          display_str = '{}: {} {}%'.format(i, class_name, int(100 * scores[i]))
         box_to_display_str_map[box].append(display_str)
         if agnostic_mode:
           box_to_color_map[box] = 'DarkOrange'
@@ -423,3 +420,4 @@ def visualize_boxes_and_labels_on_image_array(image,
           color=color,
           radius=line_thickness / 2,
           use_normalized_coordinates=use_normalized_coordinates)
+  return
