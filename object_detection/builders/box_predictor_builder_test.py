@@ -14,7 +14,7 @@
 # ==============================================================================
 
 """Tests for box_predictor_builder."""
-import mock
+import unittest.mock as mock
 import tensorflow as tf
 
 from google.protobuf import text_format

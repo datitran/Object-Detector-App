@@ -21,7 +21,7 @@ item {
 item {
   name: "/m/05czz6l"
   id: 5
-  display_name: "airplane"
+  display_name: "plane"
 }
 item {
   name: "/m/01bjv"
@@ -161,7 +161,7 @@ item {
 item {
   name: "/m/018xm"
   id: 37
-  display_name: "sports ball"
+  display_name: "ball"
 }
 item {
   name: "/m/02zt3"
@@ -311,7 +311,7 @@ item {
 item {
   name: "/m/07c52"
   id: 72
-  display_name: "tv"
+  display_name: "monitor"
 }
 item {
   name: "/m/01c648"
@@ -336,7 +336,7 @@ item {
 item {
   name: "/m/050k8"
   id: 77
-  display_name: "cell phone"
+  display_name: "mobile phone"
 }
 item {
   name: "/m/0fx9l"

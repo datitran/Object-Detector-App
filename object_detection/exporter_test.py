@@ -15,7 +15,7 @@
 
 """Tests for object_detection.export_inference_graph."""
 import os
-import mock
+import unittest.mock as mock
 import numpy as np
 import tensorflow as tf
 from object_detection import exporter
